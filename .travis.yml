@@ -1,44 +1,30 @@
-# Do not give sudo access
-sudo: false
-
-# Use the PHP environment
+# Required to run your project under the correct environment.
 language: php
 
-# Don't send notifications via email, that's annoying
-notifications:
-  email:
-    on_success: never
-    on_failure: never
+# Versions of PHP you want your project run with.
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - hhvm
 
-# Trigger only on master -- we'll add Github pull requests in settings
-branches:
-  only:
-    - master
-
-# Cache composer dependencies
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
-
-# Build these combinations of PHP and WordPress Versions
-matrix:
-  include:
-    - php: 7.2
-      env: WP_VERSION=latest
-    - php: 7.1
-      env: WP_VERSION=latest
-    - php: 7.2
-      env: WP_VERSION=trunk
-
-# Setup environment
+# Commands to be run before your environment runs.
 before_script:
-  # Export composer
-  - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  # Install plugin with composer
-  - composer install --no-progress
-  
-# Run tests
-script:
-  # Run just unit tests
-  - composer unit-tests
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
+
+# Commands you want to run that will verify your build.
+script: phpunit
+
+# allow_failures: Allow this build to fail under the specified environments.
+# fast_finish: If your build fails do not continue trying to build, just stop.
+matrix:
+  allow_failures:
+    - php: 5.6
+    - php: hhvm
+  fast_finish: true
+
+# Customize when the notification emails are sent.
+notifications:
+    on_success: never
+    on_failure: always
